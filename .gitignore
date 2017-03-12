@@ -1,0 +1,9 @@
+# Scala
+
+*.class
+*.log
+
+
+# Simple Build Tool (SBT)
+
+target/
