@@ -13,15 +13,31 @@ object Main {
   /**
    * Exercise 1
    */
-    def pascal(c: Int, r: Int): Int = ???
+    def pascal(c: Int, r: Int): Int = {
+      if (c == 0 || c == r) 1
+      else pascal(c - 1, r - 1) + pascal(c, r - 1)
+    }
   
   /**
    * Exercise 2
    */
-    def balance(chars: List[Char]): Boolean = ???
+    def balance(chars: List[Char]): Boolean = {
+      def go(cs: List[Char], d: Int):Boolean = {
+        if (d < 0) false
+        else if (cs.isEmpty) d == 0
+        else if ('(' equals cs.head) go(cs.tail, d + 1)
+        else if (')' equals cs.head) go(cs.tail, d - 1)
+        else go(cs.tail, d)
+      }
+      go(chars, 0)
+    }
   
   /**
    * Exercise 3
    */
-    def countChange(money: Int, coins: List[Int]): Int = ???
+    def countChange(money: Int, coins: List[Int]): Int = {
+        if (money < 0 || coins.isEmpty) 0
+        else if (money == 0) 1
+        else countChange(money - coins.head, coins) + countChange(money, coins.tail)
+    }
   }
