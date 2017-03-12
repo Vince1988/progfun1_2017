@@ -74,9 +74,10 @@ class FunSetSuite extends FunSuite {
    */
 
   trait TestSets {
-    val s1 = singletonSet(1)
-    val s2 = singletonSet(2)
-    val s3 = singletonSet(3)
+    val s1: Set = singletonSet(1)
+    val s2: Set = singletonSet(2)
+    val s3: Set = singletonSet(3)
+    val s4: Set = x => x >= 0 && x < 10
   }
 
   /**
@@ -110,5 +111,36 @@ class FunSetSuite extends FunSuite {
     }
   }
 
+  test("intersect returns the intersection of two given sets") {
+    new TestSets {
+      val u1 = union(s1, s2)
+      val u2 = union(s2, s3)
+      val s = intersect(u1, u2)
+
+      assert(contains(s, 2), "Intersect 1")
+      assert(!contains(s, 3), "Intersect 2")
+      assert(!contains(s, 1), "Intersect 3")
+    }
+  }
+
+  test("diff returns the difference of two given sets") {
+    new TestSets {
+      val t: Set = x => x % 2 == 0
+      val d: Set = diff(s4, t)
+
+      List(1, 3, 5, 7, 9) foreach (x => assert(contains(d, x), "Diff contains"))
+      List(0, 2, 4, 6, 8) foreach (x => assert(!contains(d, x), "Diff !contains"))
+    }
+  }
+
+  test("filter returns a subset matching a filter function") {
+    new TestSets {
+      val f: Int => Boolean = _ % 4 == 0
+      val s: Set = filter(s4, f)
+
+      List(0, 4, 8) foreach (x => assert(contains(s, x), "Filter contains"))
+      List(1, 2, 3, 5, 6, 7, 9) foreach (x => assert(!contains(s, x), "Filter !contains"))
+    }
+  }
 
 }
