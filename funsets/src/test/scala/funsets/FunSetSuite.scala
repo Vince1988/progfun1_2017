@@ -143,4 +143,31 @@ class FunSetSuite extends FunSuite {
     }
   }
 
+  test("forall returns whether all bounded integers within `s` satisfy `p`") {
+    new TestSets {
+      val s: Set = _ % 4 == 0
+
+      assert(forall(s, _ % 2 == 0), "Forall 1")
+      assert(!forall(s, _ % 3 == 0), "Forall 2")
+      assert(!forall(s4, _ % 2 == 0), "Forall 3")
+    }
+  }
+
+  test("exists returns whether there exists a bounded integer within `s` that satisfies `p`") {
+    new TestSets {
+      assert(exists(s4, _ == 5), "Exists 1")
+      assert(exists(s4, _ % 2 == 0), "Exists 2")
+      assert(!exists(s4, _ > 20), "Exists 3")
+    }
+  }
+
+  test("map returns a set transformed by applying `f` to each element of `s`") {
+    new TestSets {
+      val m: Set = map(s4, _ + 100)
+
+      assert(contains(map(s1, _ * 2), 2), "Map 1")
+      assert(!contains(map(s2, _ * 4), 2), "Map 2")
+    }
+  }
+
 }
