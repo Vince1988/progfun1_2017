@@ -58,7 +58,9 @@ object Anagrams {
    *    List(('a', 1), ('e', 1), ('t', 1)) -> Seq("ate", "eat", "tea")
    *
    */
-  lazy val dictionaryByOccurrences: Map[Occurrences, List[Word]] = dictionary.groupBy(w => wordOccurrences(w))
+  lazy val dictionaryByOccurrences: Map[Occurrences, List[Word]] = {
+    dictionary.groupBy(w => wordOccurrences(w)).withDefaultValue(List())
+  }
 
   /** Returns all the anagrams of a given word. */
   def wordAnagrams(word: Word): List[Word] = dictionaryByOccurrences.getOrElse(wordOccurrences(word), List())
@@ -85,7 +87,12 @@ object Anagrams {
    *  Note that the order of the occurrence list subsets does not matter -- the subsets
    *  in the example above could have been displayed in some other order.
    */
-  def combinations(occurrences: Occurrences): List[Occurrences] = ???
+  def combinations(occurrences: Occurrences): List[Occurrences] = occurrences match {
+    case List() => List(List())
+    case x :: xs =>
+      for (y <- (0 to x._2).toList; z <- combinations(xs))
+        yield (x._1, y) :: z filter(p => p._2 > 0)
+  }
 
   /** Subtracts occurrence list `y` from occurrence list `x`.
    *
@@ -97,7 +104,9 @@ object Anagrams {
    *  Note: the resulting value is an occurrence - meaning it is sorted
    *  and has no zero-entries.
    */
-  def subtract(x: Occurrences, y: Occurrences): Occurrences = ???
+  def subtract(x: Occurrences, y: Occurrences): Occurrences = {
+    y.foldLeft(x.toMap)((b, o) => b.updated(o._1, b(o._1) - o._2)).filter(o => o._2 > 0).toList.sorted
+  }
 
   /** Returns a list of all anagram sentences of the given sentence.
    *
@@ -139,5 +148,15 @@ object Anagrams {
    *
    *  Note: There is only one anagram of an empty sentence.
    */
-  def sentenceAnagrams(sentence: Sentence): List[Sentence] = ???
+  def sentenceAnagrams(sentence: Sentence): List[Sentence] = {
+    def go(o: Occurrences): List[Sentence] = o match {
+      case List() => List(List())
+      case _ => for {
+        combination <- combinations(o)
+        word <- dictionaryByOccurrences(combination)
+        rest <- go(subtract(o, combination))
+      } yield word :: rest
+    }
+    go(sentenceOccurrences(sentence))
+  }
 }
